@@ -3,13 +3,20 @@ package test;
 public class GameState {
 	
 	/**
+	 *  these will be the two participants of the battle that make up any GameState.
+	 *  TODO: change all variable values to be relative to these variables, like 
+	 *  instead of reservePoke, do self.reservePoke etc.
+	 */
+	public PlayerTrainer enemy;
+	public Enemy self;
+	/**
 	 * reserve pokemon that the AI trainer has, if AI is a wild pokemon this == 0
 	 */
-	public int reservePoke = 0;
+	public int reservePoke = self.reservePoke;
 	/**
 	 * reserve pokemon that the player trainer has
 	 */
-	public int enemyReservePoke = 0;
+	public int enemyReservePoke;
 	/**
 	 * percentage of health that the AI controlled pokemon has, this value will be scaled down
 	 * as to not effect the decision more than any other variable
@@ -19,11 +26,11 @@ public class GameState {
 	 * percentage of health the players pokemon has, this value will be scaled down as to not
 	 * effect the decision more than any other variable
 	 */
-	public int enemyPokeHealth = 100;
+	public int enemyPokeHealth;
 	/**
 	 * AI controlled pokemon type, used to check match-up against player pokemon
 	 */
-	public String pokeType;
+	public String pokeType = self.currentPokemon().type;
 	/**
 	 * player controlled pokemon type, used to check match-up against AI pokemon
 	 */
@@ -31,7 +38,7 @@ public class GameState {
 	/**
 	 * AI controlled pokemon level, used to check match-up against player pokemon
 	 */
-	public int pokeLevel;
+	public int pokeLevel = self.currentPokemon().getLevel();
 	/**
 	 * player controlled pokemon level, used to check match-up against AI pokemon
 	 */
@@ -46,17 +53,23 @@ public class GameState {
 	 * since its supposed to be "wild"
 	 * @param enemy - the enemy that is encountered
 	 */
-	public GameState(Enemy enemy)
+	public GameState(PlayerTrainer enemy, Enemy self)
 	{
 		// if wild pokemon, reservePoke = 0
-		reservePoke = enemy.reserve;
+		enemyReservePoke = enemy.reservePoke;
 		pokeHealth = enemy.pokeHealth;
-		pokeType = enemy.currentPokemon().type;
-		pokeLevel = enemy.currentPokemon().level;
+		enemyPokeType = enemy.currentPokemon().type;
+		enemyPokeLevel = enemy.currentPokemon().getLevel();
 		
 		// Gotta do the same thing for the player class
 	}
 	
+	/**
+	 * need a rating system, going to get Jonathans help on this because of the way the Stats work.
+	 * basically I'm just going to compare a bunch of things and rate the GameState based on who's
+	 * in a better position, then I can use that rating to do A* path-finding and battle AI
+	 * @return
+	 */
 	public int hRating()
 	{
 		double heuristic = (reservePoke - enemyReservePoke) + (enemyPokeHealth / 100) + (pokeLevel - enemyPokeLevel);
